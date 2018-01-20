@@ -1,0 +1,99 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-01 07:47+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/"
+
+#: 404.php:10
+msgid "Sorry, page not found"
+msgstr ""
+
+#: 404.php:12
+msgid "It looks like nothing was found at this location."
+msgstr ""
+
+#: comments.php:8
+msgid "This post is password protected. Enter the password to view comments."
+msgstr ""
+
+#: comments.php:39
+msgid "Comments are closed."
+msgstr ""
+
+#: functions.php:82
+msgid "Sidebar"
+msgstr ""
+
+#: functions.php:85
+msgid "Standard Sidebar"
+msgstr ""
+
+#: functions.php:96 functions.php:99
+msgid "Footer Left Area"
+msgstr ""
+
+#: functions.php:110 functions.php:113
+msgid "Footer Right Area"
+msgstr ""
+
+#: header.php:12
+msgid "Menu"
+msgstr ""
+
+#. Name of the template
+msgid "Page with Left Sidebar"
+msgstr ""
+
+#. Name of the template
+msgid "Page Without Sidebar"
+msgstr ""
+
+#: search.php:10
+msgid "Search Results for \""
+msgstr ""
+
+#: template-parts/content-blog.php:20 template-parts/content-search.php:20
+msgid "Read More"
+msgstr ""
+
+#: template-parts/content-blog.php:28
+msgid "Comments"
+msgstr ""
+
+#: template-parts/content-blog.php:33
+msgid "Posted on"
+msgstr ""
+
+#: template-parts/content-blog.php:33
+msgid "by"
+msgstr ""
+
+#. Name of the theme
+msgid "Golden Black"
+msgstr ""
+
+#. Description of the theme
+msgid "Theme for blogs with dark style"
+msgstr ""
+
+#. URI of the theme
+msgid "https://vipaweb.es"
+msgstr ""
+
+#. Author of the theme
+msgid "franvipa"
+msgstr ""
+
+#. Author URI of the theme
+msgid "https://profiles.wordpress.org/franvipa/"
+msgstr ""
