@@ -17,8 +17,7 @@ $blacklite_sidebar_post = get_theme_mod( 'blacklite_sidebar_post' );
 		<main id="main" class="site-main <?php if($blacklite_sidebar_post) : ?>full-width<?php endif; ?>" role="main">
 
 		<?php
-		while ( have_posts() ) : the_post();
-
+		while ( have_posts() ) : the_post(); 
 			get_template_part( 'template-parts/content', get_post_format() );
 
 			the_post_navigation();

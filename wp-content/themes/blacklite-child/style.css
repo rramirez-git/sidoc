@@ -10,7 +10,15 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: blacklite
 Template: blacklite
 */
-@import url("../blacklite/style.css");
 
 /* =Aquí empieza la personalización de tu tema
 -------------------------------------------------------------- */
+
+/***
+* hierarchy-view
+*/
+
+ol.imgx-list {
+	list-style-type: decimal-leading-zero;
+	list-style-position: inside;
+}
