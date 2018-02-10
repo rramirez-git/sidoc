@@ -27,16 +27,21 @@ require_once( get_stylesheet_directory() . '/post-types/generic.php' );
 
 $imgx_post_types = array();
 $dir = dir( get_stylesheet_directory() . '/post-types' );
+$dirs = array();
 while( false !== ( $entry = $dir->read() ) ) {
 	if( "." != $entry && ".." != $entry && is_dir( $dir->path . "/" . $entry ) ) {
-		$loader_file = $dir->path . "/" . $entry . "/" . "init-posttype.php";
-		if( file_exists( $loader_file ) ) {
-			$ptype = ( false !== strpos( $entry, "_" ) ? substr( $entry, strpos( $entry, "_" ) + 1 ) : $entry );
-			$imgx_post_types[ $ptype ] = array( 
-				'path' => $dir->path . "/" . $entry . "/",
-				'uri' => get_stylesheet_directory_uri(). "/post-types/$entry/"
-				);
-			require_once( $loader_file );
-		}
+		array_push( $dirs, $entry );
+	}
+}
+sort( $dirs );
+foreach( $dirs as $entry ) {
+	$loader_file = $dir->path . "/" . $entry . "/" . "init-posttype.php";
+	if( file_exists( $loader_file ) ) {
+		$ptype = ( false !== strpos( $entry, "_" ) ? substr( $entry, strpos( $entry, "_" ) + 1 ) : $entry );
+		$imgx_post_types[ $ptype ] = array( 
+			'path' => $dir->path . "/" . $entry . "/",
+			'uri' => get_stylesheet_directory_uri(). "/post-types/$entry/"
+			);
+		require_once( $loader_file );
 	}
 }
