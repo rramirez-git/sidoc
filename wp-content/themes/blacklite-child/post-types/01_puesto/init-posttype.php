@@ -15,9 +15,9 @@ function IMGXPRegister_Puesto() {
 		'labels' 		=> array(
 							"name" 					=> "Puestos",
 							"singularname" 			=> "Puesto",
-							"add_new" 				=> "Añadir",
-							"add_new_item" 			=> "Añadir",
-							"edit_item" 			=> "Actualizar",
+							"add_new" 				=> "Crear Nuevo Puesto",
+							"add_new_item" 			=> "Nuevo Puesto",
+							"edit_item" 			=> "Actualizar Puesto",
 							"new_item" 				=> "Nuevo",
 							"view_item" 			=> "Ver",
 							"search_item" 			=> "Buscar",
@@ -32,6 +32,8 @@ function IMGXPRegister_Puesto() {
 		'hierarchical'	=> true,
 		'supports'		=> array( 'title', 'editor', 'thumbnail' )
 	) );
+	add_shortcode( 'EstructuraOrganizacional', 'IMGX_GeneraEstructuraOrganizacional_SC' );
+	add_shortcode( 'EstructuraOrganizacionalParcial', 'IMGX_GeneraEstructuraOrganizacional_SCP' );
 }
 
 function IMGX_Puesto_MetaBox() {
@@ -46,6 +48,18 @@ function IMGX_Puesto_MetaBox_Callback( $post ) {
 		<div class="custom-meta-box">
 			<table>
 				<tbody>
+					<tr>
+						<td class="label">Shortcodes:</td>
+						<td class="control">
+							<input type="text" readonly="readonly" value="[EstructuraOrganizacional post=<?php echo $post->ID; ?>]" />
+						</td>
+					</tr>
+					<tr>
+						<td class="label">&nbsp;</td>
+						<td class="control">
+							<input type="text" readonly="readonly" value="[EstructuraOrganizacionalParcial post=<?php echo $post->ID; ?>]" />
+						</td>
+					</tr>
 					<tr>
 						<td class="label">
 							Funciones:
@@ -85,6 +99,30 @@ function IMGX_Puesto_Save( $post_id ) {
 	update_post_meta( $post_id, 'imgx_guid', esc_attr( isset( $_POST[ "imgx_guid" ] ) ? $_POST[ "imgx_guid" ] : CreateGUID() ) );
 	update_post_meta( $post_id, 'imgx_puesto_funciones', esc_attr( isset( $_POST[ "funciones" ] ) ? $_POST[ "funciones" ] : '' ) );
 	update_post_meta( $post_id, 'imgx_puesto_padre', esc_attr( isset( $_POST[ "padre" ] ) ? $_POST[ "padre" ] : '' ) );
+}
+
+function IMGX_GeneraEstructuraOrganizacional_SC( $args ) {
+	$args = shortcode_atts( array( 'post' => null ), $args );
+	if( null == $args[ "post" ] || ! is_numeric( $args[ "post" ] ) ) {
+		return "";
+	}
+	ob_start();
+	IMGX_GeneraEstructuraOrganizacional( intval( $args[ "post" ] ) );
+	$contenido = "\n" . ob_get_contents() . "\n";
+	ob_end_clean();
+	return $contenido;
+}
+
+function IMGX_GeneraEstructuraOrganizacional_SCP( $args ) {
+	$args = shortcode_atts( array( 'post' => null ), $args );
+	if( null == $args[ "post" ] || ! is_numeric( $args[ "post" ] ) ) {
+		return "";
+	}
+	ob_start();
+	IMGX_GeneraEstructuraOrganizacional_Parcial( intval( $args[ "post" ] ) );
+	$contenido = "\n" . ob_get_contents() . "\n";
+	ob_end_clean();
+	return $contenido;
 }
 
 function IMGX_Puesto_Dependencia_AddAdminColumnList_head( $defaults ) {
@@ -175,3 +213,158 @@ function IMGX_GetGuid( $post_id ) {
 	$guid = $wpdb->get_results( $wpdb->prepare( "select meta_value from {$pref}postmeta where post_id = %s and meta_key = %s;", $post_id , 'imgx_guid' ), 'ARRAY_A' )[ 0 ][ "meta_value" ];
 	return $guid;
 }
+
+function IMGX_GetRoots() {
+	global $wpdb;
+	$pref = $wpdb->prefix;
+	$res = array();
+	$regs = $wpdb->get_results( $wpdb->prepare( "select post_id as id from {$pref}postmeta p where meta_key = %s and ( meta_value is null or length( p.meta_value ) = 0 ) and post_id in (select id from {$pref}posts where post_status = %s and post_type = %s )", 'imgx_puesto_padre', 'publish', 'imgx_puesto' ), 'ARRAY_A' );
+	foreach( $regs as $reg ) {
+		array_push( $res, $reg[ "id" ] );
+	}
+	return $res;
+}
+
+function IMGX_ProcesaPuesto( $post_id ) {
+	$guid = IMGX_GetGuid( $post_id );
+	$hijos = IMGX_GetPuestoHierarchyHijos( $guid );
+	$data = IMGX_GetDataPuesto( $guid );
+	?>
+	<div class="hv-item">
+		<?php if( count( $hijos ) > 0 ): ?>
+			<div class="hv-item-parent">
+				<?php echo IMGX_CreatePerson( '<a href="' . $data[ "guid" ] . '">' . $data[ "post_title" ] . '</a>' ); ?>
+			</div>
+			<div class="hv-item-children">
+				<?php 
+				$class_hijo_unico = ( count( $hijos ) == 1 ? 'hijo-unico' : '' );
+				foreach( $hijos as $hijo ): ?>
+					<div class="hv-item-child <?php echo $class_hijo_unico; ?>">
+						<?php IMGX_ProcesaPuesto( $hijo ); ?>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		<?php else: ?>
+			<?php echo IMGX_CreatePerson( '<a href="' . $data[ "guid" ] . '">' . $data[ "post_title" ] . '</a>' ); ?>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+function IMGX_GeneraEstructuraOrganizacional( $post_puesto_raiz ) {
+	?>
+	<div class="management-hierarchy">
+		<div class="hv-container">
+			<div class="hv-wrapper">
+				<?php IMGX_ProcesaPuesto( $post_puesto_raiz ); ?>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
+function IMGX_GeneraEstructuraOrganizacional_Parcial( $post_puesto ) {
+	$metas = new MyMetas( $post_puesto );
+	$data = IMGX_GetDataPuesto( $post_puesto, false );
+	$data_padre = IMGX_GetDataPuesto( $metas->getMeta( 'imgx_puesto_padre' ) );
+	$posts_hijo = IMGX_GetPuestoHierarchyHijos( $metas->getMeta( 'imgx_guid' ) );
+	$posts_hermanos = array();
+	if( null != $data_padre ) {
+		$aux = IMGX_GetPuestoHierarchyHijos( IMGX_GetGuid( $data_padre[ "id" ] ) );
+		foreach( $aux as $hermano ) {
+			if( $hermano != $post_puesto ) {
+				array_push( $posts_hermanos, $hermano );
+			}
+		}
+	}
+	?>
+	<div class="management-hierarchy">
+		<div class="hv-container">
+			<div class="hv-wrapper">
+				<?php if( null != $data_padre ): ?>
+					<div class="hv-item">
+						<div class="hv-item-parent">
+							<?php echo IMGX_CreatePerson( '<a href="' . $data_padre[ "guid" ] . '">' . $data_padre[ "post_title" ] . '</a>' ); ?>
+						</div>
+						<div class="hv-item-children">
+							<?php if( 0 == count( $posts_hermanos ) ): ?>
+								<?php if( 0 == count( $posts_hijo ) ): ?>
+									<div class="hv-item-child hijo-unico puesto_actual">
+										<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+									</div>
+								<?php else: ?>
+									<div class="hv-item-child hijo-unico">
+										<div class="hv-item">
+											<div class="hv-item-parent puesto_actual">
+												<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+											</div>
+											<div class="hv-item-children">
+												<?php foreach( $posts_hijo as $hijo ): ?>
+													<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
+													<div class="hv-item-child">
+														<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
+													</div>
+												<?php endforeach; ?>
+											</div>
+										</div>
+									</div>
+								<?php endif; ?>
+							<?php else: ?>
+								<?php foreach( $posts_hermanos as $k => $hermano ): ?>
+									<?php $data_hermano = IMGX_GetDataPuesto( $hermano, false ); ?>
+									<?php if( floor( count( $posts_hermanos ) / 2 ) == $k ): ?>
+										<?php if( 0 == count( $posts_hijo ) ): ?>
+											<div class="hv-item-child puesto_actual">
+												<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+											</div>
+										<?php else: ?>
+											<div class="hv-item">
+												<div class="hv-item-parent puesto_actual">
+													<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+												</div>
+												<div class="hv-item-children">
+													<?php foreach( $posts_hijo as $hijo ): ?>
+														<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
+														<div class="hv-item-child">
+															<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
+														</div>
+													<?php endforeach; ?>
+												</div>
+											</div>
+										<?php endif; ?>
+									<?php endif; ?>
+									<div class="hv-item-child">
+										<?php echo IMGX_CreatePerson( '<a href="' . $data_hermano[ "guid" ] . '">' . $data_hermano[ "post_title" ] . '</a>' ); ?>
+									</div>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</div>
+					</div>
+				<?php else: ?>
+					<?php if( 0 == count( $posts_hijo ) ): ?>
+						<div class="hv-item puesto_actual">
+							<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+						</div>
+					<?php else: ?>
+						<div class="hv-item">
+							<div class="hv-item-parent puesto_actual">
+								<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+							</div>
+							<div class="hv-item-children">
+								<?php $class_unico = ( 1 == count( $posts_hijo ) ? 'hijo-unico' : '' ); ?>
+								<?php foreach( $posts_hijo as $hijo ): ?>
+									<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
+									<div class="hv-item-child <?php echo $class_unico; ?>">
+										<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
+									</div>
+								<?php endforeach; ?>
+							</div>
+						</div>
+					<?php endif; ?>
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
