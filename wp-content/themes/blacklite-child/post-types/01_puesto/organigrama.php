@@ -15,12 +15,12 @@ function IMGX_CreatePerson( $puesto, $picture = "", $name = "" ) {
 	return $contenido;
 }
 
-function IMGX_Organigrama_CreateItem( $puesto, $picture = "", $name = "", $is_padre = false, $is_hijo_unico = false ) {
+function IMGX_Organigrama_CreateItem( $puesto, $picture = "", $name = "", $is_padre = false, $is_hijo_unico = false, $debug = false ) {
 	ob_start();
 	$hirerachy_class = ( $is_padre ? 'hv-item-parent' : 'hv-item-child' );
 	$unique_class = ( $is_hijo_unico ? 'hijo-unico' : '' );
 	?>
-	<div class="<?php echo "$hirerachy_class $unique_class"; ?>">
+	<div class="<?php echo "$hirerachy_class $unique_class"; ?>"><?php if( $debug ) { var_dump( func_get_args() ); } ?>
         <?php echo IMGX_CreatePerson( $puesto, $picture, $name ); ?>
 	</div>
 	<?php

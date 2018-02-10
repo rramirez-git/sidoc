@@ -52,3 +52,11 @@ transform: translateY(-100%);
 	width: 0;
 }
 
+.management-hierarchy .puesto_actual .person > .name {
+	font-weight: bolder;
+	font-size: 150%;
+}
+
+.person {
+	min-width: 105px;
+}
