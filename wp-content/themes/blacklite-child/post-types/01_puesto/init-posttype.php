@@ -318,7 +318,7 @@ function IMGX_GeneraEstructuraOrganizacional_Parcial( $post_puesto ) {
 												<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
 											</div>
 										<?php else: ?>
-											<div class="hv-item-child puesto_actual">
+											<div class="hv-item-child">
 												<div class="hv-item">
 													<div class="hv-item-parent puesto_actual">
 														<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
