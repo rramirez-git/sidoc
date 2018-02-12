@@ -318,17 +318,19 @@ function IMGX_GeneraEstructuraOrganizacional_Parcial( $post_puesto ) {
 												<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
 											</div>
 										<?php else: ?>
-											<div class="hv-item">
-												<div class="hv-item-parent puesto_actual">
-													<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
-												</div>
-												<div class="hv-item-children">
-													<?php foreach( $posts_hijo as $hijo ): ?>
-														<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
-														<div class="hv-item-child">
-															<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
-														</div>
-													<?php endforeach; ?>
+											<div class="hv-item-child puesto_actual">
+												<div class="hv-item">
+													<div class="hv-item-parent puesto_actual">
+														<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
+													</div>
+													<div class="hv-item-children">
+														<?php foreach( $posts_hijo as $hijo ): ?>
+															<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
+															<div class="hv-item-child">
+																<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
+															</div>
+														<?php endforeach; ?>
+													</div>
 												</div>
 											</div>
 										<?php endif; ?>
