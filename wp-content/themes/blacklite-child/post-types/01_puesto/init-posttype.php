@@ -324,6 +324,7 @@ function IMGX_GeneraEstructuraOrganizacional_Parcial( $post_puesto ) {
 														<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
 													</div>
 													<div class="hv-item-children">
+														<?php if( count( $posts_hijo ) == 1 ): ?>
 															<?php 
 															$hijo = $posts_hijo[ 0 ];
 															$data_hijo = IMGX_GetDataPuesto( $hijo, false ); 
