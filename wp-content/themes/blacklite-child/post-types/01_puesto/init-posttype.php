@@ -299,12 +299,22 @@ function IMGX_GeneraEstructuraOrganizacional_Parcial( $post_puesto ) {
 												<?php echo IMGX_CreatePerson( $data[ "post_title" ] ); ?>
 											</div>
 											<div class="hv-item-children">
-												<?php foreach( $posts_hijo as $hijo ): ?>
-													<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
-													<div class="hv-item-child">
+												<?php if( count( $posts_hijo ) == 1 ): ?>
+													<?php 
+													$hijo = $posts_hijo[ 0 ];
+													$data_hijo = IMGX_GetDataPuesto( $hijo, false ); 
+													?>
+													<div class="hv-item-child hijo-unico">
 														<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
 													</div>
-												<?php endforeach; ?>
+												<?php else: ?>
+													<?php foreach( $posts_hijo as $hijo ): ?>
+														<?php $data_hijo = IMGX_GetDataPuesto( $hijo, false ); ?>
+														<div class="hv-item-child">
+															<?php echo IMGX_CreatePerson( '<a href="' . $data_hijo[ "guid" ] . '">' . $data_hijo[ "post_title" ] . '</a>' ); ?>
+														</div>
+													<?php endforeach; ?>
+												<?php endif; ?>
 											</div>
 										</div>
 									</div>
