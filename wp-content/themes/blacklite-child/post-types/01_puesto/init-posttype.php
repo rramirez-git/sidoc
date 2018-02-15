@@ -30,7 +30,7 @@ function IMGXPRegister_Puesto() {
 		'menu_icon'		=> "dashicons-networking",
 		'menu_position'	=> 20,
 		'hierarchical'	=> true,
-		'supports'		=> array( 'title', 'editor', 'thumbnail' )
+		'supports'		=> array( 'title', 'editor' )
 	) );
 	add_shortcode( 'EstructuraOrganizacional', 'IMGX_GeneraEstructuraOrganizacional_SC' );
 	add_shortcode( 'EstructuraOrganizacionalParcial', 'IMGX_GeneraEstructuraOrganizacional_SCP' );
@@ -42,9 +42,14 @@ function IMGX_Puesto_MetaBox() {
 
 function IMGX_Puesto_MetaBox_Callback( $post ) {
 	$metas = new MyMetas( $post->ID );
-	$padres = IMGX_GetPuestos( $metas->getMeta( 'imgx_guid' ) )
+	$puestos = IMGX_GetPuestos( $metas->getMeta( 'imgx_guid' ) );
+	$raices = IMGX_GetRoots();
+	$organigrama = array();
+	foreach( $raices as $raiz ) {
+		array_push( $organigrama, IMGX_GeneraOrganigrama_Data( $raiz ) );
+	}
 	?>
-		<input type="hidden" name="guid" id="guid" value="<?php echo esc_attr( $metas->getMeta( 'imgx_guid' ) ); ?>" />
+		<input type="hidden" name="imgx_guid" id="imgx_guid" value="<?php echo esc_attr( $metas->getMeta( 'imgx_guid' ) ); ?>" />
 		<div class="custom-meta-box">
 			<table>
 				<tbody>
@@ -65,7 +70,7 @@ function IMGX_Puesto_MetaBox_Callback( $post ) {
 							Funciones:
 						</td>
 						<td class="control">
-							<textarea id="funciones" name="funciones" rows="15"><?php echo esc_attr( $metas->getMeta( 'imgx_puesto_funciones' ) ); ?></textarea>
+							<textarea id="imgx_puesto_funciones" name="imgx_puesto_funciones" rows="15"><?php echo esc_attr( $metas->getMeta( 'imgx_puesto_funciones' ) ); ?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -73,12 +78,10 @@ function IMGX_Puesto_MetaBox_Callback( $post ) {
 							Depende de:
 						</td>
 						<td class="control">
-							<select name="padre" id="padre">
+							<select name="imgx_puesto_padre" id="imgx_puesto_padre">
 								<option value=""></option>
-								<?php foreach( $padres as $opt ): ?>
-									<option value="<?php echo $opt[ "guid" ]; ?>" <?php echo ( $opt[ "guid" ] == $metas->getMeta('imgx_puesto_padre') ? 'selected="selected"' : '' ); ?> >
-										<?php echo $opt[ "puesto" ]; ?>
-									</option>
+								<?php foreach( $organigrama as $raiz ): ?>
+									<?php echo IMGX_GeneraOptionsPuesto( $raiz, $metas->getMeta('imgx_puesto_padre') ); ?>
 								<?php endforeach; ?>
 							</select>
 						</td>
